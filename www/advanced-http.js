@@ -123,6 +123,12 @@ var publicInterface = {
   },
   downloadFile: function (url, params, headers, filePath, success, failure) {
     return publicInterface.sendRequest(url, { method: 'download', params: params, headers: headers, filePath: filePath }, success, failure);
+  },
+  setX509AuthClientCredentials: function (pkcs10Container, password, success, failure){
+    return exec(success, failure, "CordovaHttpPlugin", "setX509AuthClientCredentials", [pkcs10Container, password]);
+  },
+  resetX509AuthClientCredentials: function (success, failure){
+    return exec(success, failure, "CordovaHttpPlugin", "resetX509AuthClientCredentials", []);
   }
 };
 

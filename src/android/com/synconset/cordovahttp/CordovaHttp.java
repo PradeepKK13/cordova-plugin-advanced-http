@@ -43,6 +43,7 @@ abstract class CordovaHttp {
     private static AtomicBoolean acceptAllCerts = new AtomicBoolean(false);
     private static AtomicBoolean validateDomainName = new AtomicBoolean(true);
     private static AtomicBoolean disableRedirect = new AtomicBoolean(false);
+    private static AtomicBoolean X509_CLIENT_AUTHENTICATION = new AtomicBoolean(false);
 
     private String urlString;
     private Object params;
@@ -76,6 +77,10 @@ abstract class CordovaHttp {
         if (accept) {
             sslPinning.set(false);
         }
+    }
+
+    public static void setX509ClientAuthentication(boolean enable){
+        X509_CLIENT_AUTHENTICATION.set(enable);
     }
 
     public static void validateDomainName(boolean accept) {
@@ -131,6 +136,9 @@ abstract class CordovaHttp {
         }
         if (sslPinning.get()) {
             request.pinToCerts();
+        }
+        if(X509_CLIENT_AUTHENTICATION.get()){
+            request.authenticateWithX509Certificate();
         }
 
         return request;
