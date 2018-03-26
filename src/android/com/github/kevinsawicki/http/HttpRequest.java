@@ -478,15 +478,16 @@ public class HttpRequest {
   }
 
   private static KeyStore getKeyStoreForPinnedCertificates() throws GeneralSecurityException, IOException{
-
     String keyStoreType = KeyStore.getDefaultType();
     KeyStore keyStore = KeyStore.getInstance(keyStoreType);
     keyStore.load(null, null);
-    if(PINNED_CERTS!=null) {
+
+    if (PINNED_CERTS != null) {
       for (int i = 0; i < PINNED_CERTS.size(); i++) {
         keyStore.setCertificateEntry("CA" + i, PINNED_CERTS.get(i));
       }
     }
+
     return keyStore;
   }
 
@@ -506,7 +507,7 @@ public class HttpRequest {
       kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
       kmf.init(keystore, password.toCharArray());
     }
-    TrustManagerFactory tmf =null;
+    TrustManagerFactory tmf = null;
     if (PINNED_CERTS != null) {
 
       KeyStore keyStoreForPinnedCertificates = getKeyStoreForPinnedCertificates();
@@ -516,8 +517,8 @@ public class HttpRequest {
       tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
       tmf.init(keyStoreForPinnedCertificates);
     }
-    KeyManager[] keyManagers= kmf!=null? kmf.getKeyManagers() : null;
-    TrustManager[] trustManagers= tmf!=null? tmf.getTrustManagers() :  new TrustManager[] { new X509TrustManager() {
+    KeyManager[] keyManagers = kmf != null ? kmf.getKeyManagers() : null;
+    TrustManager[] trustManagers = tmf != null ? tmf.getTrustManagers() : new TrustManager[] { new X509TrustManager() {
 
       public X509Certificate[] getAcceptedIssuers() {
         return new X509Certificate[0];

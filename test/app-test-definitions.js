@@ -2,9 +2,10 @@ const hooks = {
   onBeforeEachTest: function(done) {
     cordova.plugin.http.clearCookies();
     cordova.plugin.http.acceptAllCerts(false, function() {
-      cordova.plugin.http.enableSSLPinning(false, done, done);
+      cordova.plugin.http.enableSSLPinning(false, function() {
+        cordova.plugin.http.resetX509AuthClientCredentials(done, done);
+      }, done);
     }, done);
-    cordova.plugin.http.resetX509ClientAuthCredentials();
   }
 };
 
@@ -37,16 +38,17 @@ const helpers = {
       }, done);
     }, done);
   },
-  readFromFile : function (resultCallback, errorCallback, fileName) {
+  readFromFile: function (resultCallback, errorCallback, fileName) {
     window.resolveLocalFileSystemURL(cordova.file.applicationDirectory + fileName, function (fileEntry) {
       fileEntry.file(function (file) {
         var fileReader = new FileReader();
+
         fileReader.onload = function() {
           resultCallback(this.result);
         };
         fileReader.readAsArrayBuffer(file);
-      },errorCallback);
-    },errorCallback);
+      }, errorCallback);
+    }, errorCallback);
   },
   resetX509ClientAuthCredentials : function(done) { cordova.plugin.http.resetX509ClientAuthCredentials(done, done);  }
 };
@@ -479,7 +481,7 @@ const tests = [
     }
   },{
     description: 'should fail because X509 Cert is missing',
-    expected: 'reject',
+    expected: 'rejected',
     func: function(resolve, reject) {
       cordova.plugin.http.get('https://client-cert-missing.badssl.com/', {}, {}, resolve, reject);
     },
@@ -488,7 +490,7 @@ const tests = [
     }
   },{
     description: 'should reject X509 Client Authentication with invalid Cert',
-    expected: 'reject',
+    expected: 'rejected',
     before: function(done) {
       helpers.readFromFile(function(arraybuffer) {
         cordova.plugin.http.setX509AuthClientCredentials(arraybuffer, 'test', done, done);
@@ -502,7 +504,7 @@ const tests = [
     }
   },{
     description: 'should Authenticate with X509 Certificate',
-    expected: 'resolve: {"status: 200"}',
+    expected: 'resolved: {"status: 200"}',
     before: function(done) {
       helpers.readFromFile(function(arraybuffer) {
         cordova.plugin.http.setX509AuthClientCredentials(arraybuffer, 'badssl.com', done, done);
